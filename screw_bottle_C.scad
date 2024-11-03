@@ -17,6 +17,8 @@ expand_interior_param = true;//[0:1]
 include_ring_param = 1;//[0:1]
 include_gasket_param = 1;//[0:1]
 gasket_thickness_param = 2.2;//[0:0.01:2]
+// 0-2 range? really 0- (2-gasket thickness)
+cap_top_thickness_param = 1.0;//[0:0.1:2] 
 ring_height_param = 4;//[1:50]
 ring_text_param = "M D K";
 PieceToRender = 0; //[0:All pieces, 1:Container, 2:Cap, 3:Ring, 4:Gasket]
@@ -41,11 +43,10 @@ if ((PieceToRender == 0 || PieceToRender == 4) && include_gasket_param == 1) {
 }
 
 // yeah its obj 4 but its at the top, deal with it
-module gasket(inside_diameter, gasket_thickness, cut){
+module gasket(inside_diameter, gasket_thickness, cut, cap_top_thickness = 0){
     $fn = 60; // 60 facets
     wall_thickness = -1.25; //  TODO calculate
     inside_radius = inside_diameter / 2;
-    cap_top_thickness = 20; // 0-3 range? really 0- (3-gasket thickness)
     
     if(cut == true){
         translate([inside_diameter + 10, 0, cap_top_thickness])
@@ -130,40 +131,39 @@ module cap(inside_diameter, knurled_cap, additional_cap_height){
   knn = round((inside_diameter + 8) * 1.0);
   ka = 120 / knn;
 
-  //difference(){
-  translate([inside_diameter + 10, 0, 0])
   difference(){
-    cylinder(r = inside_radius + 4, h = 12 + additional_cap_height);
+      translate([inside_diameter + 10, 0, 0])
+      difference(){
+        cylinder(r = inside_radius + 4, h = 12 + additional_cap_height);
 
-    translate([0, 0, 2 + additional_cap_height])
-    linear_extrude(height = 10.1, twist = -180 * 10.1)
-    translate([0.5, 0])
-    circle(r = inside_radius + 1.8);
+        translate([0, 0, 2 + additional_cap_height])
+        linear_extrude(height = 10.1, twist = -180 * 10.1)
+        translate([0.5, 0])
+        circle(r = inside_radius + 1.8);
 
-    rotate_extrude()
-    translate([inside_radius + 4, 0])
-    circle(r = 1.6, $fn = 4);
+        rotate_extrude()
+        translate([inside_radius + 4, 0])
+        circle(r = 1.6, $fn = 4);
 
-    if (knurled_cap == 1) {
+        if (knurled_cap == 1) {
 
-      for (j = [0: knn - 1])
-        for (k = [-1, 1])
-          rotate([0, 0, j * 360 / knn])
-      linear_extrude(height = 12.1 + additional_cap_height, twist = k * ka * (12.1 + additional_cap_height), $fn = 30)
-      translate([inside_radius + 4, 0])
-      circle(r = 0.8, $fn = 4);
+          for (j = [0: knn - 1])
+            for (k = [-1, 1])
+              rotate([0, 0, j * 360 / knn])
+          linear_extrude(height = 12.1 + additional_cap_height, twist = k * ka * (12.1 + additional_cap_height), $fn = 30)
+          translate([inside_radius + 4, 0])
+          circle(r = 0.8, $fn = 4);
 
-    }
-    translate([0, 0, 10 + additional_cap_height])
-    cylinder(r1 = inside_radius + 1.5, r2 = inside_radius + 2.5, h = 2.1);
+        }
+        translate([0, 0, 10 + additional_cap_height])
+        cylinder(r1 = inside_radius + 1.5, r2 = inside_radius + 2.5, h = 2.1);
 
-    translate([0, 0, 2])
-    cylinder(r = inside_radius, h = additional_cap_height + 0.1);
-  }
-  
-  //cut out gaskets spot (no tolerances for now)
-  difference(){
-      gasket(inside_diameter, gasket_thickness_param, cut = true);
+        translate([0, 0, 2])
+        cylinder(r = inside_radius, h = additional_cap_height + 0.1);
+      }
+      
+    //cut out gaskets spot (no tolerances for now)  
+    gasket(inside_diameter, gasket_thickness_param, cut = true, cap_top_thickness = cap_top_thickness_param);
   }
 }
 
