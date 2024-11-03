@@ -1,14 +1,19 @@
+// TODO: add gasket object
+// push to github for kyle
+
 inside_height_param = 28;//[16:1:240]
 inside_diameter_param = 26;//[7:1:94]
 additional_cap_height_param = 0;//[0:50]
 knurled_container_param = true;//[0:1]
-knurled_cap_param = 1;//[0:1]
-expand_interior_param = 0;//[0:1]
-include_ring_param = 0;//[0:1]
+knurled_cap_param = true;//[0:1]
+expand_interior_param = true;//[0:1]
+// needs to be 1 not true because its used in math
+include_ring_param = 1;//[0:1]
+include_gasket_param = 1;//[0:1]
 ring_height_param = 4;//[1:50]
 ring_text_param = "M D K";
-PieceToRender = 0; //[0:All pieces, 1:Container, 2:Cap, 3:Ring]
-Spinbox= 5;
+PieceToRender = 0; //[0:All pieces, 1:Container, 2:Cap, 3:Ring, 4:Gasket]
+
 
 //Overall height with cap and ring will be inside_height + 4
 
@@ -24,14 +29,18 @@ if ((PieceToRender == 0 || PieceToRender == 3) && include_ring_param == 1) {
   ring(inside_diameter_param, ring_text_param);
 }
 
+if ((PieceToRender == 0 || PieceToRender == 4) && include_gasket_param == 1) {
+  ring(inside_diameter_param, ring_text_param);
+}
+
 module container(inside_height, inside_diameter, expand_interior, knurled_cap, include_ring, ring_height){
   $fn = 60;
   inside_radius = inside_diameter / 2;
   knn = round((inside_diameter + 8));
   ka = (120 / knn);
+  inside_height_magic = inside_height - 8;
   difference(){
     union(){
-      inside_height_magic = inside_height - 8;
 
       //threads
       translate([0, 0, inside_height_magic])
