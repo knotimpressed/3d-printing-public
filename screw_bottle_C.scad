@@ -1,5 +1,6 @@
 // TODO: add gasket object
 // push to github for kyle
+// add slider to change $fn
 
 inside_height_param = 28;//[16:1:240]
 inside_diameter_param = 26;//[7:1:94]
@@ -10,6 +11,7 @@ expand_interior_param = true;//[0:1]
 // needs to be 1 not true because its used in math
 include_ring_param = 1;//[0:1]
 include_gasket_param = 1;//[0:1]
+gasket_thickness_param = 0.2;//[0:0.01:2]
 ring_height_param = 4;//[1:50]
 ring_text_param = "M D K";
 PieceToRender = 0; //[0:All pieces, 1:Container, 2:Cap, 3:Ring, 4:Gasket]
@@ -30,11 +32,22 @@ if ((PieceToRender == 0 || PieceToRender == 3) && include_ring_param == 1) {
 }
 
 if ((PieceToRender == 0 || PieceToRender == 4) && include_gasket_param == 1) {
-  ring(inside_diameter_param, ring_text_param);
+  gasket(inside_diameter_param, gasket_thickness_param);
+}
+
+// yeah its obj 4 but its at the top, deal with it
+module gasket(inside_diameter, gasket_thickness){
+    $fn = 60; // 60 facets
+    wall_thickness = -1.25; //  TODO calculate
+    inside_radius = inside_diameter / 2;
+    
+    translate([-10 - inside_diameter, 0, 0])
+    //translate([inside_diameter + 10, 0, 2]) // to check against cap
+    cylinder(r = inside_radius -wall_thickness, h = gasket_thickness);
 }
 
 module container(inside_height, inside_diameter, expand_interior, knurled_cap, include_ring, ring_height){
-  $fn = 60;
+  $fn = 60; // this is the number of facets, short and dumb and fixed name
   inside_radius = inside_diameter / 2;
   knn = round((inside_diameter + 8));
   ka = (120 / knn);
