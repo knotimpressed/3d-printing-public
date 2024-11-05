@@ -1,5 +1,4 @@
-// TODO: add gasket object
-// push to github for kyle
+// TODO:
 // add slider to change $fn
 // add tolerance slider for gasket
 
