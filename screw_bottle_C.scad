@@ -44,17 +44,23 @@ if ((PieceToRender == 0 || PieceToRender == 4) && include_gasket_param == 1) {
 // yeah its obj 4 but its at the top, deal with it
 module gasket(inside_diameter, gasket_thickness, cut, cap_top_thickness = 0){
     $fn = 60; // 60 facets
+    origin_x = 0; // defaults
+    origin_z = 0;
     wall_thickness = -1.25; //  TODO calculate
     inside_radius = inside_diameter / 2;
     
+    
     if(cut == true){
-        translate([inside_diameter + 10, 0, cap_top_thickness])
-        cylinder(r = inside_radius -wall_thickness, h = gasket_thickness);
+        origin_x = inside_diameter + 10;
+        origin_z = cap_top_thickness;
     }
     else{
-        translate([-10 - inside_diameter, 0, 0])
-        cylinder(r = inside_radius -wall_thickness, h = gasket_thickness);
+        origin_x = -10 - inside_diameter;
+        origin_z = cap_top_thickness;
     }
+    
+    translate([origin_x, 0, origin_z])
+    cylinder(r = inside_radius -wall_thickness, h = gasket_thickness);
 }
 
 module container(inside_height, inside_diameter, expand_interior, knurled_cap, include_ring, ring_height){
