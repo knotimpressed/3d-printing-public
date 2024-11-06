@@ -1,13 +1,13 @@
 // TODO:
 // add slider to change $fn
 // add slider for height of container knurling
+// is the gasket space being cut into the same height okay?
 
 // notes: lack of syntax errors sucks
 // semicolons are WEIRD
 
 PieceToRender = 0; //[0:All pieces, 1:Container, 2:Cap, 3:Ring, 4:Gasket]
 // applied to both sides of gasket
-gasket_tolerance_param = 0.05;//[0:0.001:1]
 inside_height_param = 28;//[16:1:240]
 inside_diameter_param = 26;//[7:1:94]
 additional_cap_height_param = 0;//[0:50]
@@ -20,7 +20,8 @@ include_gasket_param = 1;//[0:1]
 gasket_thickness_param = 2.2;//[0:0.01:2]
 // 0-2 range? really 0- (2-gasket thickness)
 cap_top_thickness_param = 1.0;//[0:0.1:2] 
-peg_diameter_param = 1.0;//[0:4:10] 
+gasket_tolerance_param = 0.05;//[0:0.001:1]
+peg_diameter_param = 10.0;//[0:0.5:20] 
 ring_height_param = 4;//[1:50]
 ring_text_param = "M D K";
 
@@ -49,17 +50,17 @@ module gasket(inside_diameter, gasket_thickness, cut, cap_top_thickness = 0, peg
     // if block makes a new scope so we have to do this :(
     origin_x = cut ? inside_diameter + 10 : -10 - inside_diameter;
     origin_z = cap_top_thickness;
+    origin_x = inside_diameter + 10;
     tolerance = cut ? - gasket_tolerance : gasket_tolerance;
     
-    wall_thickness = -1.25; //  TODO calculate
+    
+    wall_thickness = -1.25; //  TODO calculate automatically
     inside_radius = inside_diameter / 2;
     
-    //translate([origin_x, 0, origin_z])
-    //cylinder(r = inside_radius -wall_thickness, h = gasket_thickness);
     translate([origin_x, 0, origin_z])
     difference(){
-        cylinder(r = inside_radius -wall_thickness, h = gasket_thickness);
-        cylinder(r = peg_diameter/2, h = gasket_thickness+2);
+        cylinder(r = inside_radius -wall_thickness-tolerance, h = gasket_thickness); // main body
+        cylinder(r = peg_diameter/2 + tolerance, h = gasket_thickness+2); // peg cutout
     }
 }
 
