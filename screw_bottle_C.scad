@@ -1,6 +1,6 @@
 // TODO:
 // add slider to change $fn
-// add tolerance slider for gasket
+// add slider for height of container knurling
 
 // notes: lack of syntax errors sucks
 // semicolons are WEIRD
@@ -63,9 +63,8 @@ module gasket(inside_diameter, gasket_thickness, cut, cap_top_thickness = 0, peg
     }
 }
 
-module container(inside_height, inside_diameter, expand_interior, knurled_cap, include_ring, ring_height){
+module container(inside_height, inside_diameter, expand_interior, knurled_container, include_ring, ring_height){
   $fn = 60; // this is the number of facets, short and dumb and fixed name
-  echo(knurled_cap);
   inside_radius = inside_diameter / 2;
   knn = round((inside_diameter + 8));
   ka = (120 / knn);
@@ -118,7 +117,7 @@ module container(inside_height, inside_diameter, expand_interior, knurled_cap, i
     translate([inside_radius + 4, 0])
     circle(r = 1.6, $fn = 4);
 
-    if (knurled_cap == 1) {
+    if (knurled_container == true) {
       //knurling
       for (j = [0: knn - 1])
         for (k = [-1, 1]) {
@@ -151,7 +150,7 @@ module cap(inside_diameter, knurled_cap, additional_cap_height){
         translate([inside_radius + 4, 0])
         circle(r = 1.6, $fn = 4);
 
-        if (knurled_cap == 1) {
+        if (knurled_cap == true) {
 
           for (j = [0: knn - 1])
             for (k = [-1, 1])
