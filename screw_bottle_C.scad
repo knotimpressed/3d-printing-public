@@ -6,6 +6,8 @@
 // semicolons are WEIRD
 
 PieceToRender = 0; //[0:All pieces, 1:Container, 2:Cap, 3:Ring, 4:Gasket]
+// applied to both sides of gasket
+gasket_tolerance_param = 0.05;//[0:0.001:1]
 inside_height_param = 28;//[16:1:240]
 inside_diameter_param = 26;//[7:1:94]
 additional_cap_height_param = 0;//[0:50]
@@ -38,15 +40,17 @@ if ((PieceToRender == 0 || PieceToRender == 3) && include_ring_param == 1) {
 }
 
 if ((PieceToRender == 0 || PieceToRender == 4) && include_gasket_param == 1) {
-   gasket(inside_diameter_param, gasket_thickness_param, cut = false, peg_diameter=peg_diameter_param);
+   gasket(inside_diameter_param, gasket_thickness_param, cut = false, peg_diameter=peg_diameter_param, gasket_tolerance=gasket_tolerance_param);
 }
 
 // yeah its obj 4 but its at the top, deal with it
-module gasket(inside_diameter, gasket_thickness, cut, cap_top_thickness = 0, peg_diameter){
+module gasket(inside_diameter, gasket_thickness, cut, cap_top_thickness = 0, peg_diameter, gasket_tolerance){
     $fn = 60; // 60 facets
     // if block makes a new scope so we have to do this :(
     origin_x = cut ? inside_diameter + 10 : -10 - inside_diameter;
     origin_z = cap_top_thickness;
+    tolerance = cut ? - gasket_tolerance : gasket_tolerance;
+    
     wall_thickness = -1.25; //  TODO calculate
     inside_radius = inside_diameter / 2;
     
@@ -55,12 +59,13 @@ module gasket(inside_diameter, gasket_thickness, cut, cap_top_thickness = 0, peg
     translate([origin_x, 0, origin_z])
     difference(){
         cylinder(r = inside_radius -wall_thickness, h = gasket_thickness);
-        cylinder(r = 7/2, h = gasket_thickness+2);
+        cylinder(r = peg_diameter/2, h = gasket_thickness+2);
     }
 }
 
 module container(inside_height, inside_diameter, expand_interior, knurled_cap, include_ring, ring_height){
   $fn = 60; // this is the number of facets, short and dumb and fixed name
+  echo(knurled_cap);
   inside_radius = inside_diameter / 2;
   knn = round((inside_diameter + 8));
   ka = (120 / knn);
@@ -164,7 +169,7 @@ module cap(inside_diameter, knurled_cap, additional_cap_height){
       }
       
     //cut out gaskets spot (no tolerances for now)  
-    gasket(inside_diameter, gasket_thickness_param, cut = true, cap_top_thickness = cap_top_thickness_param, peg_diameter=peg_diameter_param);
+    gasket(inside_diameter, gasket_thickness_param, cut = true, cap_top_thickness = cap_top_thickness_param, peg_diameter=peg_diameter_param, gasket_tolerance=gasket_tolerance_param);
   }
 }
 
