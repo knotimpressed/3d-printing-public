@@ -6,46 +6,55 @@
 // notes: lack of syntax errors sucks
 // semicolons are WEIRD
 
-PieceToRender = 0; //[0:All pieces, 1:Container, 2:Cap, 3:Ring, 4:Gasket]
+/* [General] */
+PieceToRender = 0;  //[0:All pieces, 1:Container, 2:Cap, 3:Ring, 4:Gasket]
+
 // applied to both sides of gasket
-inside_height_param = 28;//[16:1:240]
-inside_diameter_param = 26;//[7:1:94]
-additional_cap_height_param = 0;//[0:50]
-knurled_container_param = true;//[0:1]
-knurled_cap_param = true;//[0:1]
-expand_interior_param = true;//[0:1]
-// needs to be 1 not true because its used in math
-include_ring_param = 1;//[0:1]
-include_gasket_param = 1;//[0:1]
-gasket_thickness_param = 2.2;//[0:0.01:2]
+/* [Tube] */
+inside_height_param = 28;         //[16:1:240]
+inside_diameter_param = 26;       //[7:1:94]
+
+/* [Knurling] */
+knurled_container_param = true;
+knurled_cap_param = true;
+expand_interior_param = true;
+
+/* [Gasket] */
+include_gasket_param = true;
+gasket_thickness_param = 2.2;        //[0:0.01:2]
+gasket_tolerance_param = 0.05;       //[0:0.001:1]
+gasket_center_diameter_param = 10.0;  //[0:0.5:20]
+
+/* [Cap] */
 // 0-2 range? really 0- (2-gasket thickness)
-cap_top_thickness_param = 1.0;//[0:0.1:2] 
-gasket_tolerance_param = 0.05;//[0:0.001:1]
-peg_diameter_param = 10.0;//[0:0.5:20] 
-ring_height_param = 4;//[1:50]
+cap_top_thickness_param = 1.0;  //[0:0.1:2]
+additional_cap_height_param = 0;  //[0:50]
+
+/* [Ring] */
+include_ring_param = true;
+ring_height_param = 4;  //[1:50]
 ring_text_param = "M D K";
 
-
-//Overall height with cap and ring will be inside_height + 4
+// Overall height with cap and ring will be inside_height + 4
 
 if (PieceToRender == 0 || PieceToRender == 1) {
-  container(inside_height_param, inside_diameter_param, expand_interior_param, knurled_container_param, include_ring_param, ring_height_param);
+  container(inside_height_param, inside_diameter_param, expand_interior_param, knurled_container_param, include_ring_param ? 1 : 0, ring_height_param);
 }
 
 if (PieceToRender == 0 || PieceToRender == 2) {
   cap(inside_diameter_param, knurled_cap_param, additional_cap_height_param);
 }
 
-if ((PieceToRender == 0 || PieceToRender == 3) && include_ring_param == 1) {
+if ((PieceToRender == 0 || PieceToRender == 3) && include_ring_param) {
   ring(inside_diameter_param, ring_text_param);
 }
 
-if ((PieceToRender == 0 || PieceToRender == 4) && include_gasket_param == 1) {
-   gasket(inside_diameter_param, gasket_thickness_param, cut = false, peg_diameter=peg_diameter_param, gasket_tolerance=gasket_tolerance_param);
+if ((PieceToRender == 0 || PieceToRender == 4) && include_gasket_param) {
+   gasket(inside_diameter_param, gasket_thickness_param, cut = false, gasket_center_diameter=gasket_center_diameter_param, gasket_tolerance=gasket_tolerance_param);
 }
 
 // yeah its obj 4 but its at the top, deal with it
-module gasket(inside_diameter, gasket_thickness, cut, cap_top_thickness = 0, peg_diameter, gasket_tolerance){
+module gasket(inside_diameter, gasket_thickness, cut, cap_top_thickness = 0, gasket_center_diameter, gasket_tolerance){
     $fn = 60; // 60 facets
     // if block makes a new scope so we have to do this :(
     origin_x = cut ? inside_diameter + 10 : -10 - inside_diameter;
@@ -60,7 +69,7 @@ module gasket(inside_diameter, gasket_thickness, cut, cap_top_thickness = 0, peg
     translate([origin_x, 0, origin_z])
     difference(){
         cylinder(r = inside_radius -wall_thickness-tolerance, h = gasket_thickness); // main body
-        cylinder(r = peg_diameter/2 + tolerance, h = gasket_thickness+2); // peg cutout
+        cylinder(r = gasket_center_diameter/2 + tolerance, h = gasket_thickness+2); // gasket_center cutout
     }
 }
 
@@ -83,13 +92,11 @@ module container(inside_height, inside_diameter, expand_interior, knurled_contai
       cylinder(r = inside_radius + 4, h = inside_height_magic - include_ring * ring_height_param);
 
       //neck   
-      if (include_ring == 1) {
+      if (include_ring) {
         cylinder(r = inside_radius + 2.5, h = inside_height - 3.99 - include_ring * ring_height_param);
       }
-
-
     }
-    if (expand_interior == 0) {
+    if (expand_interior) {
       translate([0, 0, 2])
       cylinder(r = inside_radius, h = inside_height + 0.1);
     }
@@ -118,7 +125,7 @@ module container(inside_height, inside_diameter, expand_interior, knurled_contai
     translate([inside_radius + 4, 0])
     circle(r = 1.6, $fn = 4);
 
-    if (knurled_container == true) {
+    if (knurled_container) {
       //knurling
       for (j = [0: knn - 1])
         for (k = [-1, 1]) {
@@ -169,7 +176,7 @@ module cap(inside_diameter, knurled_cap, additional_cap_height){
       }
       
     //cut out gaskets spot (no tolerances for now)  
-    gasket(inside_diameter, gasket_thickness_param, cut = true, cap_top_thickness = cap_top_thickness_param, peg_diameter=peg_diameter_param, gasket_tolerance=gasket_tolerance_param);
+    gasket(inside_diameter, gasket_thickness_param, cut = true, cap_top_thickness = cap_top_thickness_param, gasket_center_diameter=gasket_center_diameter_param, gasket_tolerance=gasket_tolerance_param);
   }
 }
 
