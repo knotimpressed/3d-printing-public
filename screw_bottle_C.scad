@@ -90,7 +90,7 @@ module container(inside_height, inside_diameter, expand_interior, knurled_contai
 
 
     }
-    if (expand_interior == 0) {
+    if (expand_interior == false) {
       translate([0, 0, 2])
       cylinder(r = inside_radius, h = inside_height + 0.1);
     }
