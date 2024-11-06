@@ -11,6 +11,7 @@ PieceToRender = 0; //[0:All pieces, 1:Container, 2:Cap, 3:Ring, 4:Gasket]
 inside_height_param = 28;//[16:1:240]
 inside_diameter_param = 26;//[7:1:94]
 additional_cap_height_param = 0;//[0:50]
+cap_knurl_percent_param = .5;//[0:0.01:1]
 knurled_container_param = true;//[0:1]
 container_knurl_percent_param = .5;//[0:0.01:1]
 knurled_cap_param = true;//[0:1]
@@ -34,7 +35,7 @@ if (PieceToRender == 0 || PieceToRender == 1) {
 }
 
 if (PieceToRender == 0 || PieceToRender == 2) {
-  cap(inside_diameter_param, knurled_cap_param, additional_cap_height_param);
+  cap(inside_diameter_param, knurled_cap_param, additional_cap_height_param, cap_knurl_percent_param);
 }
 
 if ((PieceToRender == 0 || PieceToRender == 3) && include_ring_param == 1) {
@@ -133,7 +134,7 @@ module container(inside_height, inside_diameter, expand_interior, knurled_contai
   }
 }
 
-module cap(inside_diameter, knurled_cap, additional_cap_height){
+module cap(inside_diameter, knurled_cap, additional_cap_height, cap_knurl_percent){
   $fn = 60;
   inside_radius = inside_diameter / 2;
   knn = round((inside_diameter + 8) * 1.0);
@@ -154,7 +155,7 @@ module cap(inside_diameter, knurled_cap, additional_cap_height){
         circle(r = 1.6, $fn = 4);
 
         if (knurled_cap == true) {
-
+            translate([0,0,(12+additional_cap_height)*cap_knurl_percent])
           for (j = [0: knn - 1])
             for (k = [-1, 1])
               rotate([0, 0, j * 360 / knn])
