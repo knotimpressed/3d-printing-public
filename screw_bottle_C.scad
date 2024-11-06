@@ -12,6 +12,7 @@ inside_height_param = 28;//[16:1:240]
 inside_diameter_param = 26;//[7:1:94]
 additional_cap_height_param = 0;//[0:50]
 knurled_container_param = true;//[0:1]
+container_knurl_percent_param = .5;//[0:0.01:1]
 knurled_cap_param = true;//[0:1]
 expand_interior_param = true;//[0:1]
 // needs to be 1 not true because its used in math
@@ -29,7 +30,7 @@ ring_text_param = "M D K";
 //Overall height with cap and ring will be inside_height + 4
 
 if (PieceToRender == 0 || PieceToRender == 1) {
-  container(inside_height_param, inside_diameter_param, expand_interior_param, knurled_container_param, include_ring_param, ring_height_param);
+  container(inside_height_param, inside_diameter_param, expand_interior_param, knurled_container_param, include_ring_param, ring_height_param, container_knurl_percent_param);
 }
 
 if (PieceToRender == 0 || PieceToRender == 2) {
@@ -64,7 +65,7 @@ module gasket(inside_diameter, gasket_thickness, cut, cap_top_thickness = 0, peg
     }
 }
 
-module container(inside_height, inside_diameter, expand_interior, knurled_container, include_ring, ring_height){
+module container(inside_height, inside_diameter, expand_interior, knurled_container, include_ring, ring_height, container_knurl_percent){
   $fn = 60; // this is the number of facets, short and dumb and fixed name
   inside_radius = inside_diameter / 2;
   knn = round((inside_diameter + 8));
@@ -120,6 +121,7 @@ module container(inside_height, inside_diameter, expand_interior, knurled_contai
 
     if (knurled_container == true) {
       //knurling
+      translate([0,0,inside_height*container_knurl_percent])
       for (j = [0: knn - 1])
         for (k = [-1, 1]) {
           rotate([0, 0, j * 360 / knn])
