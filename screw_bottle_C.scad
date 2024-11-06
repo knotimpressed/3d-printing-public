@@ -35,7 +35,7 @@ additional_cap_height_param = 0;  //[0:50]
 /* [Ring] */
 include_ring_param = true;
 ring_height_param = 4;  //[1:50]
-ring_text_param = "M D K";
+ring_text_param = "W O W";
 
 // Overall height with cap and ring will be inside_height + 4
 
