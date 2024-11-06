@@ -50,7 +50,7 @@ module gasket(inside_diameter, gasket_thickness, cut, cap_top_thickness = 0, peg
     // if block makes a new scope so we have to do this :(
     origin_x = cut ? inside_diameter + 10 : -10 - inside_diameter;
     origin_z = cap_top_thickness;
-    origin_x = inside_diameter + 10;
+    //origin_x = inside_diameter + 10; // for debug fit check
     tolerance = cut ? - gasket_tolerance : gasket_tolerance;
     
     
